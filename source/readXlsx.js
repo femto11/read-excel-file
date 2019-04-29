@@ -42,7 +42,7 @@ export default function readXlsx(contents, xml, options = {}) {
 
     // Parse sheet data.
 
-    const sheetId = typeof options.sheet === 'number' ? options.sheet : getSheetId(properties.sheets, options.sheet)
+    const sheetIdx = typeof options.sheet === 'number' ? options.sheet : getSheetByName(properties.sheets, options.sheet)
 
     if (!sheetId || !contents[`xl/worksheets/sheet${sheetId}.xml`]) {
       criticalError = createSheetNotFoundError(options.sheet, properties.sheets)
@@ -369,10 +369,11 @@ function parseProperties(content, xml) {
     properties.epoch1904 = true
   }
   // Get sheet names (just because they're available).
+  properties.sheets = [];
   for (const sheet of xml.select(book, null, '//a:sheets/a:sheet', namespaces)) {
     if (sheet.getAttribute('name')) {
       properties.sheets = properties.sheets || {}
-      properties.sheets[sheet.getAttribute('sheetId')] = sheet.getAttribute('name')
+      properties.sheets.push({ id: sheet.getAttribute('sheetId'), name: sheet.getAttribute('name') });
     }
   }
   return properties;
@@ -386,6 +387,10 @@ function isDateTemplate(template) {
     }
   }
   return true
+}
+
+function getSheetByName(sheets, name) {
+  return sheets.findIndex(s => s.name === name);
 }
 
 function getSheetId(sheets, name) {
