@@ -44,12 +44,12 @@ export default function readXlsx(contents, xml, options = {}) {
 
     const sheetIdx = typeof options.sheet === 'number' ? options.sheet : getSheetByName(properties.sheets, options.sheet)
 
-    if (!sheetId || !contents[`xl/worksheets/sheet${sheetId}.xml`]) {
+    if (!sheetIdx || !contents[`xl/worksheets/sheet${sheetIdx}.xml`]) {
       criticalError = createSheetNotFoundError(options.sheet, properties.sheets)
       throw criticalError
     }
 
-    sheet = parseSheet(contents[`xl/worksheets/sheet${sheetId}.xml`], xml, values, styles, properties, options)
+    sheet = parseSheet(contents[`xl/worksheets/sheet${sheetIdx}.xml`], xml, values, styles, properties, options)
   }
   catch (error) {
     if (error === criticalError) {
